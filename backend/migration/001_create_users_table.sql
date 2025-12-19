@@ -1,0 +1,13 @@
+-- +goose Up
+CREATE TABLE
+    `users` (
+        `id` INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
+        `name` VARCHAR(255) NOT NULL,
+        `email` VARCHAR(255) UNIQUE NOT NULL,
+        `password` VARCHAR(255) NOT NULL,
+        `created_at` DATETIME (3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+        `updated_at` DATETIME (3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3)
+    );
+
+-- +goose Down
+DROP TABLE IF EXISTS `users`;
