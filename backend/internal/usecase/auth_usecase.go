@@ -6,3 +6,5 @@ type AuthUsecase interface {
 	Register(email, password string) (domain.User, error)
 	Login(email, password string) (string, error)
 }
+
+
