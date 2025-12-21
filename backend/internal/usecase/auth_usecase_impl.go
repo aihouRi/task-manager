@@ -46,5 +46,13 @@ func (u *authUsecase) Register(name, email, password string) (domain.User, error
 }
 
 func (u *authUsecase) Login(email, password string) (string, error) {
-	return "", nil
+	user, err := u.authRepo.GetByEmail(email)
+	if err != nil {
+		return "", fmt.Errorf("login failed")
+	}
+
+	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
+		return "", fmt.Errorf("login failed")
+	}
+	return "dummy-token", nil
 }
