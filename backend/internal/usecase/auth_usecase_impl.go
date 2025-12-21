@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/aihouRi/task-manager/backend/internal/auth"
 	"github.com/aihouRi/task-manager/backend/internal/domain"
 	"github.com/aihouRi/task-manager/backend/internal/repository"
 	"golang.org/x/crypto/bcrypt"
@@ -54,5 +55,11 @@ func (u *authUsecase) Login(email, password string) (string, error) {
 	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
 		return "", fmt.Errorf("login failed")
 	}
-	return "dummy-token", nil
+
+	token, err := auth.GenerateToken(user)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }
