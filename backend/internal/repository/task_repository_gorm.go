@@ -59,7 +59,7 @@ func (r *taskRepository) GetByID(id int) (domain.Task, error) {
 
 func (r *taskRepository) UpdateTask(task domain.Task) (domain.Task, error) {
 	modelTask := model.Task{ID: task.ID, Title: task.Title, Description: task.Description, Status: task.Status, UserID: task.UserID}
-	if err := r.db.Save(&modelTask).Error; err != nil {
+	if err := r.db.Updates(&modelTask).Error; err != nil {
 		return domain.Task{}, err
 	}
 	domainTask := domain.Task{ID: modelTask.ID, Title: modelTask.Title, Description: modelTask.Description, Status: modelTask.Status, UserID: modelTask.UserID}
