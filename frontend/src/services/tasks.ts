@@ -11,5 +11,5 @@ export const createTask = async (title: string): Promise<void> => {
 };
 
 export const deleteTask = async (id: number): Promise<void> => {
-  await http.delete(`/task/${id}`);
+  await http.delete(`/tasks/${id}`);
 };
