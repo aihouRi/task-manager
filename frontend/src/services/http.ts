@@ -17,3 +17,19 @@ http.interceptors.request.use((config) => {
 
   return config;
 });
+
+http.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    const status = error.response?.status;
+
+    if (status == 401) {
+      tokenStorge.clear();
+      window.location.replace("/login");
+    }
+
+    return Promise.reject(error);
+  }
+);
