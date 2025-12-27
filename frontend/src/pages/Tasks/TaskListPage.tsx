@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import type { Task } from "../../types/task";
 import { deleteTask, fetchTasks } from "../../services/tasks";
-import { Box, Button, Checkbox, List, ListItem, Typography } from "@mui/material";
+import { Box, Button, Checkbox, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { CreateTaskDialog } from "./CreateTaskDialog";
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const TaskListPage = () => {
     const [tasks, setTasks] = useState<Task[]>([])
@@ -39,29 +40,53 @@ const TaskListPage = () => {
 
     return (
         <>
-            <Box>
+            <Box sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 2,
+            }}>
                 <Typography variant="h5" sx={{ mb: 2 }}>
-                    Task
+                    Tasks
                 </Typography>
-                <List>
-                    {tasks.map((task) => (
-                        <ListItem key={task.id} secondaryAction={
-                            <Button
-                                color="error"
-                                onClick={() => handleDelete(task.id)}>
-                                Delete
-                            </Button>
-                        }>
-                            <Checkbox checked={task.status} disabled />
-                            {task.title}
-                        </ListItem>
-                    ))}
-                </List>
+
+                <Button variant="contained" onClick={() => { setCreateOpen(true) }}>
+                    New Task
+                </Button>
             </Box>
 
-            <Button variant="contained" onClick={() => { setCreateOpen(true) }}>
-                New Task
-            </Button>
+            <TableContainer component={Paper} sx={{ mt: 2, boxShadow: 'none', border: '1px solid #e0e0e0' }}>
+                <Table>
+                    <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
+                        <TableRow>
+                            <TableCell width="10%">Status</TableCell>
+                            <TableCell width="25%">Title</TableCell>
+                            <TableCell width="40%">Description</TableCell>
+                            <TableCell width="25%" align="right">Actions</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {tasks.map((task) => (
+                            <TableRow key={task.id} hover>
+                                <TableCell>
+                                    <Checkbox checked={task.status} disabled size="small" />
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 'medium' }}>
+                                    {task.title}
+                                </TableCell>
+                                <TableCell>
+                                    {task.description}
+                                </TableCell>
+                                <TableCell align="right">
+                                    <IconButton color="primary" onClick={() => handleDelete(task.id)}>
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
 
             <CreateTaskDialog
                 open={createOpen}
@@ -73,6 +98,7 @@ const TaskListPage = () => {
             />
         </>
     )
+
 }
 
 export default TaskListPage

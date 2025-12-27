@@ -10,14 +10,16 @@ type Props = {
 
 export const CreateTaskDialog = ({ open, onClose, onCreated }: Props) => {
     const [title, setTitle] = useState("")
+    const [description, setDescription] = useState("")
     const [loading, setLoading] = useState(false)
 
     const handleCreate = async () => {
         setLoading(true)
         try {
-            await createTask(title)
+            await createTask(title, description)
             onCreated()
             setTitle("")
+            setDescription("")
         } catch (e) {
             console.error(e)
         } finally {
@@ -37,11 +39,19 @@ export const CreateTaskDialog = ({ open, onClose, onCreated }: Props) => {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                 />
+
+                <TextField
+                    label="Description"
+                    fullWidth
+                    margin="normal"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                />
             </DialogContent>
 
             <DialogActions>
                 <Button onClick={onClose}>Cancel</Button>
-                <Button onClick={handleCreate} disabled={loading || !title}>
+                <Button onClick={handleCreate} disabled={loading || !title || !description}>
                     Create
                 </Button>
             </DialogActions>

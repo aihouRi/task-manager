@@ -6,8 +6,11 @@ export const fetchTasks = async (): Promise<Task[]> => {
   return res.data;
 };
 
-export const createTask = async (title: string): Promise<void> => {
-  await http.post("/tasks", { title });
+export const createTask = async (
+  title: string,
+  description: string,
+): Promise<void> => {
+  await http.post("/tasks", { title, description});
 };
 
 export const deleteTask = async (id: number): Promise<void> => {
