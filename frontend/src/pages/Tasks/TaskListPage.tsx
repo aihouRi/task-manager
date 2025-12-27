@@ -1,14 +1,19 @@
 import { useEffect, useState } from "react";
 import type { Task } from "../../types/task";
-import { deleteTask, fetchTasks } from "../../services/tasks";
+import { createTask, deleteTask, fetchTasks, updateTask } from "../../services/tasks";
 import { Box, Button, Checkbox, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
-import { CreateTaskDialog } from "./CreateTaskDialog";
+import { TaskDialog } from "./TaskDialog";
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
 const TaskListPage = () => {
+    type TaskDialogMode = 'create' | 'edit' | null
+
     const [tasks, setTasks] = useState<Task[]>([])
     const [loading, setLoading] = useState(true)
-    const [createOpen, setCreateOpen] = useState(false)
+    const [dialogOpen, setDialogOpen] = useState(false)
+    const [dialogMode, setDialogMode] = useState<TaskDialogMode>(null)
+    const [editingTask, setEditingTask] = useState<Task | null>(null)
 
     const load = async () => {
         try {
@@ -27,6 +32,51 @@ const TaskListPage = () => {
             load()
         } catch (e) {
             console.error(e)
+        }
+    }
+
+    const handleCreate = async (input: { title: string; description: string }) => {
+        await createTask(input.title, input.description)
+        setDialogOpen(false)
+        load()
+    }
+
+    const handleUpdate = async (input: { title: string; description: string }) => {
+        if (!editingTask) return
+        await updateTask(editingTask.id, input)
+        setDialogOpen(false)
+        load()
+    }
+
+    const openCreateDialog = () => {
+        setDialogMode('create')
+        setEditingTask(null)
+        setDialogOpen(true)
+    }
+
+    const openEditDialog = (task: Task) => {
+        setDialogMode('edit')
+        setEditingTask(task)
+        setDialogOpen(true)
+    }
+
+    const closeDialog = () => {
+        setDialogOpen(false)
+        setDialogMode(null)
+        setEditingTask(null)
+    }
+
+    const handleToggleStatus = async (task: Task, checked: boolean) => {
+        const previousTasks = [...tasks]
+        setTasks(prev => prev.map(t =>
+            t.id === task.id ? { ...t, status: checked } : t
+        ))
+
+        try {
+            await updateTask(task.id, { status: checked })
+        } catch (err) {
+            console.error("Failed to update status:", err)
+            setTasks(previousTasks)
         }
     }
 
@@ -50,7 +100,7 @@ const TaskListPage = () => {
                     Tasks
                 </Typography>
 
-                <Button variant="contained" onClick={() => { setCreateOpen(true) }}>
+                <Button variant="contained" onClick={openCreateDialog}>
                     New Task
                 </Button>
             </Box>
@@ -69,16 +119,27 @@ const TaskListPage = () => {
                         {tasks.map((task) => (
                             <TableRow key={task.id} hover>
                                 <TableCell>
-                                    <Checkbox checked={task.status} disabled size="small" />
+                                    <Checkbox checked={task.status}
+                                        size="small"
+                                        onChange={(e) => handleToggleStatus(task, e.target.checked)}
+                                    />
                                 </TableCell>
                                 <TableCell sx={{ fontWeight: 'medium' }}>
                                     {task.title}
                                 </TableCell>
-                                <TableCell>
+                                <TableCell sx={{
+                                    maxWidth: 400,
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                }}>
                                     {task.description}
                                 </TableCell>
                                 <TableCell align="right">
-                                    <IconButton color="primary" onClick={() => handleDelete(task.id)}>
+                                    <IconButton color="primary" onClick={() => openEditDialog(task)}>
+                                        <EditIcon />
+                                    </IconButton>
+                                    <IconButton color="error" onClick={() => handleDelete(task.id)}>
                                         <DeleteIcon />
                                     </IconButton>
                                 </TableCell>
@@ -88,13 +149,12 @@ const TaskListPage = () => {
                 </Table>
             </TableContainer>
 
-            <CreateTaskDialog
-                open={createOpen}
-                onClose={() => setCreateOpen(false)}
-                onCreated={() => {
-                    setCreateOpen(false)
-                    load()
-                }}
+            <TaskDialog
+                open={dialogOpen}
+                mode={dialogMode}
+                task={editingTask}
+                onClose={closeDialog}
+                onSubmit={dialogMode === 'create' ? handleCreate : handleUpdate}
             />
         </>
     )

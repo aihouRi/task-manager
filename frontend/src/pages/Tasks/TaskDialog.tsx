@@ -1,25 +1,26 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material"
-import { useState } from "react"
-import { createTask } from "../../services/tasks"
+import { useEffect, useState } from "react"
+import type { Task } from "../../types/task"
 
 type Props = {
     open: boolean
+    mode: 'create' | 'edit' | null
+    task?: Task | null
     onClose: () => void
-    onCreated: () => void
+    onSubmit: (input: { title: string; description: string }) => Promise<void>
 }
 
-export const CreateTaskDialog = ({ open, onClose, onCreated }: Props) => {
+export const TaskDialog = ({ open, onClose, onSubmit, mode, task }: Props) => {
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
     const [loading, setLoading] = useState(false)
 
-    const handleCreate = async () => {
+    const handleSubmit = async () => {
         setLoading(true)
         try {
-            await createTask(title, description)
-            onCreated()
-            setTitle("")
-            setDescription("")
+            await onSubmit({ title, description })
+            setTitle('')
+            setDescription('')
         } catch (e) {
             console.error(e)
         } finally {
@@ -27,9 +28,19 @@ export const CreateTaskDialog = ({ open, onClose, onCreated }: Props) => {
         }
     }
 
+    useEffect(() => {
+        if (mode == 'edit' && task) {
+            setTitle(task.title)
+            setDescription(task.description)
+        } else if (mode == 'create') {
+            setTitle('')
+            setDescription('')
+        }
+    }, [mode, task])
+
     return (
         <Dialog open={open} onClose={onClose} fullWidth>
-            <DialogTitle>Create Task</DialogTitle>
+            <DialogTitle>{mode === 'create' ? 'Create Task' : 'Edit Task'}</DialogTitle>
 
             <DialogContent>
                 <TextField
@@ -51,8 +62,8 @@ export const CreateTaskDialog = ({ open, onClose, onCreated }: Props) => {
 
             <DialogActions>
                 <Button onClick={onClose}>Cancel</Button>
-                <Button onClick={handleCreate} disabled={loading || !title || !description}>
-                    Create
+                <Button onClick={handleSubmit} disabled={loading || !title || !description}>
+                    {mode === 'create' ? 'Create' : 'Save'}
                 </Button>
             </DialogActions>
         </Dialog>
