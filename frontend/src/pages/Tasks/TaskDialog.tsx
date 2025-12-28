@@ -4,7 +4,7 @@ import type { Task } from "../../types/task"
 
 type Props = {
     open: boolean
-    mode: 'create' | 'edit' | null
+    mode: 'create' | 'edit' | 'delete' | null
     task?: Task | null
     onClose: () => void
     onSubmit: (input: { title: string; description: string }) => Promise<void>

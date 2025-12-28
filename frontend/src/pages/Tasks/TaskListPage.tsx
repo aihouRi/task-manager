@@ -5,15 +5,15 @@ import { Box, Button, Checkbox, IconButton, Paper, Table, TableBody, TableCell, 
 import { TaskDialog } from "./TaskDialog";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import { ConfirmDialog } from "./ConfirmDialog";
 
 const TaskListPage = () => {
-    type TaskDialogMode = 'create' | 'edit' | null
-
     const [tasks, setTasks] = useState<Task[]>([])
     const [loading, setLoading] = useState(true)
-    const [dialogOpen, setDialogOpen] = useState(false)
-    const [dialogMode, setDialogMode] = useState<TaskDialogMode>(null)
-    const [editingTask, setEditingTask] = useState<Task | null>(null)
+    const [action, setAction] = useState<{ mode: 'create' | 'edit' | 'delete' | null; task: Task | null }>({
+        mode: null,
+        task: null
+    });
 
     const load = async () => {
         try {
@@ -33,37 +33,36 @@ const TaskListPage = () => {
         } catch (e) {
             console.error(e)
         }
+        closeDialog()
     }
 
     const handleCreate = async (input: { title: string; description: string }) => {
         await createTask(input.title, input.description)
-        setDialogOpen(false)
+        closeDialog()
         load()
     }
 
     const handleUpdate = async (input: { title: string; description: string }) => {
-        if (!editingTask) return
-        await updateTask(editingTask.id, input)
-        setDialogOpen(false)
+        if (!action.task) return
+        await updateTask(action.task.id, input)
+        closeDialog()
         load()
     }
 
     const openCreateDialog = () => {
-        setDialogMode('create')
-        setEditingTask(null)
-        setDialogOpen(true)
+        setAction({ mode: "create", task: null })
     }
 
     const openEditDialog = (task: Task) => {
-        setDialogMode('edit')
-        setEditingTask(task)
-        setDialogOpen(true)
+        setAction({ mode: "edit", task: task })
     }
 
+    const openDeleteConfirm = (task: Task) => {
+        setAction({ mode: 'delete', task: task });
+    };
+
     const closeDialog = () => {
-        setDialogOpen(false)
-        setDialogMode(null)
-        setEditingTask(null)
+        setAction({ mode: null, task: null })
     }
 
     const handleToggleStatus = async (task: Task, checked: boolean) => {
@@ -116,45 +115,66 @@ const TaskListPage = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {tasks.map((task) => (
-                            <TableRow key={task.id} hover>
-                                <TableCell>
-                                    <Checkbox checked={task.status}
-                                        size="small"
-                                        onChange={(e) => handleToggleStatus(task, e.target.checked)}
-                                    />
-                                </TableCell>
-                                <TableCell sx={{ fontWeight: 'medium' }}>
-                                    {task.title}
-                                </TableCell>
-                                <TableCell sx={{
-                                    maxWidth: 400,
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                }}>
-                                    {task.description}
-                                </TableCell>
-                                <TableCell align="right">
-                                    <IconButton color="primary" onClick={() => openEditDialog(task)}>
-                                        <EditIcon />
-                                    </IconButton>
-                                    <IconButton color="error" onClick={() => handleDelete(task.id)}>
-                                        <DeleteIcon />
-                                    </IconButton>
-                                </TableCell>
-                            </TableRow>
-                        ))}
+                        {tasks.length === 0 ? (<TableRow>
+                            <TableCell colSpan={4} align="center" sx={{ py: 8 }}>
+                                <Box sx={{ textAlign: 'center', color: 'text.secondary' }}>
+                                    <Typography variant="h6" gutterBottom>
+                                        No tasks found
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        Click the "New Task" button to create your first task.
+                                    </Typography>
+                                </Box>
+                            </TableCell>
+                        </TableRow>
+                        ) : (
+                            tasks.map((task) => (
+                                <TableRow key={task.id} hover>
+                                    <TableCell>
+                                        <Checkbox checked={task.status}
+                                            size="small"
+                                            onChange={(e) => handleToggleStatus(task, e.target.checked)}
+                                        />
+                                    </TableCell>
+                                    <TableCell sx={{ fontWeight: 'medium' }}>
+                                        {task.title}
+                                    </TableCell>
+                                    <TableCell sx={{
+                                        maxWidth: 400,
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                    }}>
+                                        {task.description}
+                                    </TableCell>
+                                    <TableCell align="right">
+                                        <IconButton color="primary" onClick={() => openEditDialog(task)}>
+                                            <EditIcon />
+                                        </IconButton>
+                                        <IconButton color="error" onClick={() => openDeleteConfirm(task)}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
                     </TableBody>
                 </Table>
             </TableContainer>
 
             <TaskDialog
-                open={dialogOpen}
-                mode={dialogMode}
-                task={editingTask}
+                open={action.mode === 'create' || action.mode === 'edit'}
+                mode={action.mode === 'edit' ? 'edit' : 'create'}
+                task={action.task}
                 onClose={closeDialog}
-                onSubmit={dialogMode === 'create' ? handleCreate : handleUpdate}
+                onSubmit={action.mode === 'create' ? handleCreate : handleUpdate}
+            />
+
+            <ConfirmDialog
+                open={action.mode === "delete"}
+                task={action.task}
+                onClose={closeDialog}
+                onConfirm={handleDelete}
             />
         </>
     )
