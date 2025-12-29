@@ -4,6 +4,18 @@ type LoginResponse = {
   token: string;
 };
 
+export const register = async (
+  name: string,
+  email: string,
+  password: string
+): Promise<void> => {
+  await http.post("/auth/register", {
+    name,
+    email,
+    password,
+  });
+};
+
 export const login = async (
   email: string,
   password: string
