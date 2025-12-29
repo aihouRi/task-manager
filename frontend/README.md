@@ -1,73 +1,74 @@
-# React + TypeScript + Vite
+# Task Manager Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + TypeScript + MUI を用いて実装した、タスク管理アプリケーションのフロントエンドです。  
+JWT 認証を前提としたログイン / ユーザー登録 / タスク CRUD 機能を備えた実運用を想定した構成になっています。
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 技術スタック
 
-## React Compiler
+- React
+- TypeScript
+- Vite
+- Material UI (MUI)
+- Axios
+- React Router
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 主な機能
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 認証関連
+- ユーザー登録
+- ログイン
+- JWT トークン管理（localStorage）
+- 未認証時のルートガード
+- ログアウト機能
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### タスク管理
+- タスク一覧表示（Table レイアウト）
+- タスク作成
+- タスク編集（タイトル / 説明）
+- タスク削除（確認ダイアログ付き）
+- タスク完了状態の切り替え（即時反映 + 失敗時ロールバック）
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### UI / UX
+- Dashboard レイアウト
+- Dialog を用いた Create / Edit の共通 UI
+- Optimistic UI によるスムーズな操作感
+- 空状態（タスク未登録時）の表示
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+## 画面構成
+
+- `/login`  
+  ログイン画面
+
+- `/register`  
+  ユーザー登録画面
+
+- `/tasks`  
+  タスク一覧・管理画面（認証必須）
+
+---
+
+## 環境変数
+
+`.env` ファイルをプロジェクトルートに作成してください。
+
+```
+VITE_API_BASE_URL=http://localhost:8080
+```
+---
+
+## 起動方法
+```Bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+ブラウザで以下にアクセスします。
+```Bash
+http://localhost:5173
 ```
