@@ -3,6 +3,7 @@ import { tokenStorge } from "../../services/token"
 import { Box, Button, TextField, Typography } from "@mui/material"
 import { useState } from "react"
 import { login } from "../../services/auth"
+import { userStorage } from "../../services/user"
 
 const LoginPage = () => {
     const [email, setEmail] = useState("")
@@ -11,14 +12,14 @@ const LoginPage = () => {
 
     const handleLogin = async () => {
         try {
-            const { token } = await login(email, password)
+            const { token, user } = await login(email, password)
             tokenStorge.set(token)
+            userStorage.set(user)
             navigate("/tasks", { replace: true })
         } catch (e) {
             console.error(e)
         }
     }
-
 
     return (
         <Box sx={{ maxWidth: 400, mx: "auto", mt: 8 }}>

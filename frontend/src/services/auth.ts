@@ -2,6 +2,10 @@ import { http } from "./http";
 
 type LoginResponse = {
   token: string;
+  user: {
+    email: string
+    name: string
+  }
 };
 
 export const register = async (
