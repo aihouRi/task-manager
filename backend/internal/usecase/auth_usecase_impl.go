@@ -46,20 +46,24 @@ func (u *authUsecase) Register(name, email, password string) (domain.User, error
 	return newUser, nil
 }
 
-func (u *authUsecase) Login(email, password string) (string, error) {
+func (u *authUsecase) Login(email, password string) (*LoginResult, error) {
 	user, err := u.authRepo.GetByEmail(email)
 	if err != nil {
-		return "", fmt.Errorf("login failed")
+		return &LoginResult{}, fmt.Errorf("login failed")
 	}
 
 	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
-		return "", fmt.Errorf("login failed")
+		return &LoginResult{}, fmt.Errorf("login failed")
 	}
 
 	token, err := auth.GenerateToken(user)
 	if err != nil {
-		return "", err
+		return &LoginResult{}, err
 	}
 
-	return token, nil
+	return &LoginResult{
+		Token: token,
+		Name:  user.Name,
+		Email: user.Email,
+	}, nil
 }

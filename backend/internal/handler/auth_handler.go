@@ -49,7 +49,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid request"})
 	}
 
-	token, err := h.authUsecase.Login(req.Email, req.Password)
+	result, err := h.authUsecase.Login(req.Email, req.Password)
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, echo.Map{
 			"error": "login failed",
@@ -57,6 +57,10 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, echo.Map{
-		"token": token,
+		"token": result.Token,
+		"user": echo.Map{
+			"name":  result.Name,
+			"email": result.Email,
+		},
 	})
 }
