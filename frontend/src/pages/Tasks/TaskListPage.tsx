@@ -88,12 +88,13 @@ const TaskListPage = () => {
     }
 
     return (
-        <>
+        <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
             <Box sx={{
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
                 mb: 2,
+                width: '100%'
             }}>
                 <Typography variant="h5" sx={{ mb: 2 }}>
                     Tasks
@@ -176,9 +177,8 @@ const TaskListPage = () => {
                 onClose={closeDialog}
                 onConfirm={handleDelete}
             />
-        </>
+        </Box>
     )
-
 }
 
 export default TaskListPage

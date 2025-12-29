@@ -1,4 +1,4 @@
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { Outlet, useNavigate } from "react-router-dom";
 
 const DashbordLayout = () => {
@@ -9,17 +9,26 @@ const DashbordLayout = () => {
             {/* Sidebar */}
             <Box
                 sx={{
-                    width: 240,
-                    borderRight: "1px solid #ddd",
+                    width: 150,
+                    borderRight: "1px solid #eee",
                     p: 2,
                 }}
             >
+                <Typography variant="h6" sx={{ mb: 4, fontWeight: 'bold', color: 'primary.main' }}>
+                    Task Manager
+                </Typography>
+
                 <Button
                     fullWidth
                     variant="text"
                     onClick={() => navigate("/tasks")}
+                    sx={{
+                        justifyContent: 'flex-start',
+                        textTransform: 'none',
+                        fontSize: '1rem'
+                    }}
                 >
-                    Tasks
+                    tasks
                 </Button>
             </Box>
 
@@ -27,7 +36,7 @@ const DashbordLayout = () => {
             <Box sx={{ flex: 1, p: 3 }}>
                 <Outlet />
             </Box>
-        </Box>
+        </Box >
     )
 }
 
